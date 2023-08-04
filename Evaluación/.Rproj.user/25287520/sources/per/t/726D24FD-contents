@@ -1,0 +1,144 @@
+
+library(readr)
+library(tidyverse)
+
+#  ENUT2013_nuevo <- read_csv("data/ENUT2013_nuevo2.csv")                        #
+# #
+# ENUT2013_nuevo <- ENUT2013_nuevo %>%
+#   select(-1) %>%
+#   mutate(Fuente="ENUT")
+# 
+# sies <- readRDS("data/sies10.rds")
+# sies <- rbind(sies, ENUT2013_nuevo)
+# write_rds(sies,"data/sies10_2.rds")
+
+
+sies <- readRDS("data/sies10_2.rds")
+
+table(sies$Metodologia, sies$Indicadores)
+
+
+
+sies <- sies %>%
+  filter(Indicadores!=6.3  & Indicadores!=6.4  & Indicadores!=6.5 & Indicadores!=6.6 & Indicadores!=6.300  & Indicadores!=6.400  & Indicadores!=6.500 & Indicadores!=6.600   & Indicadores!=6.7 & Indicadores!=6.700)
+
+sies$Indicadores <- as.character(sies$Indicadores)
+
+#labelleo tabla sies
+sies$Indicadores <- labelled(sies$Indicadores,
+                             labels = c('Porcentaje de ocupados que trabajan más de 45 horas semanales'                                                           = '6.100',
+                                        'Brecha por sexo entre ocupados que trabajan más de 45 horas semanales'                                                   = '6.200',
+                                        # "Tasa de participación en el trabajo doméstico no remunerado"                                                             = "6.300",
+                                        # "Brecha por sexo en la participación en el trabajo doméstico no remunerado"                                               = "6.400",
+                                        # "Brecha en la tasa de participación en el trabajo doméstico no remunerado entre el quintil 5 y 1 del ingreso per cápita familiar" = "6.500",
+                                        # "Promedio de horas diarias destinadas al trabajo doméstico no remunerado por participante"                                = "6.600",
+                                        #"Brecha por sexo en el promedio de horas diarias destinadas al trabajo doméstico no remunerado"                           = "6.700",
+                                        "Promedio de horas diarias destinadas al trabajo doméstico no remunerado por quintil de ingreso per cápita familiar"      = "6.800",
+                                        "Tasa de participación en el trabajo voluntario"                                                                           = "11.300",
+                                        "Tasa de participación en el trabajo no remunerado, por tipo"                                                             = "6.301",
+                                        "Brecha por sexo en la participación en el trabajo no remunerado, por tipo"                                               ="6.401",
+                                        "Promedio de horas diarias destinadas al trabajo no remunerado por participante, por tipo"                                ="6.601",
+                                        "Brecha por sexo en el promedio de horas diarias destinadas al trabajo no remunerado, por tipo"                           = "6.701",
+                                        "Promedio de horas diarias destinadas a las actividades recreativas"                                                      = "6.9",
+                                        "Brecha por sexo en el promedio de horas diarias destinadas a las actividades recreativas"                                = "6.101",
+                                        "Brecha por clima educativo del hogar en las horas destinadas a actividades recreativas de la población de 14 años y más" = "6.102",
+                                        "Tasa de participación en el trabajo voluntario"                                                                          = "11.3"))
+
+
+
+sies$DEG_IP<-labelled(sies$DEG_IP,
+                      labels=c('Total del país' = 0,
+                               'Región' = 1,
+                               'Jurisdicción' = 2))
+
+
+sies$DEG_OP <- labelled(sies$DEG_OP,
+                        c('Total del país' = 0,
+                          'Ciudad Autónoma de Buenos Aires' = 2,
+                          'Buenos Aires' = 6,
+                          'Catamarca' = 10,
+                          'Córdoba' = 14,
+                          'Corrientes' = 18,
+                          'Chaco' = 22,
+                          'Chubut' = 26,
+                          'Entre Ríos' = 30,
+                          'Formosa' = 34,
+                          'Jujuy' = 38,
+                          'La Pampa' = 42,
+                          'La Rioja' = 46,
+                          'Mendoza' = 50,
+                          'Misiones' = 54,
+                          'Neuquén' = 58,
+                          'Río Negro' = 62,
+                          'Salta' = 66,
+                          'San Juan' = 70,
+                          'San Luis' = 74,
+                          'Santa Cruz' = 78,
+                          'Santa Fe' = 82,
+                          'Santiago del Estero' = 86,
+                          'Tucumán' = 90,
+                          'Tierra del Fuego' = 94,
+                          'NEA'                      =100,
+                          'NOA'                      =200,
+                          'Cuyo'                     =300,
+                          'Patagonia'                =400,
+                          'GBA'                      =500,
+                          'Pampeana'                 =600,
+                          'GBA+Pampeana'                   =700))
+
+
+metaCSV   <- read.csv('data/meactual3.csv', encoding = 'UTF-8', check.names = FALSE) 
+
+
+#Paletas colores manual de estilo
+ paleta1<-c('#A183A3','#C6B3C7','#E2D8E4')#lilas
+ paleta2<-c('#EFB100','#F8D07C','#F0D796')#dorado
+ paleta3<-c('#34984F','#98BF92','#CFDFC9')#verdes
+ 
+ 
+ 
+ paleta4<-c('#593989','#875597','#88579A','#9781B7')#azules aviolatados
+ paleta5<-c('#C64F34','#DD987C','#EECCBC')#terracota
+ 
+ 
+ 
+ paleta6<-c('#8DA189','#BDC5B7','#DEE2DA')#grises
+ paleta7<-c('#96AB22','#C3CA7F','#E1E4C1')#olivas
+ 
+ 
+ 
+ paleta8<-c('#875597','#B397C2','#D8CBE2')#violeta medio
+ paleta9<-c('#AB492C','#CB8E73','#E5C6B6')#marron
+ 
+ 
+
+ 
+ paleta10<-c('#4F60A6','#969ACB','#CBCCE7')#celestes
+ paleta11<-c('#8988AC','#ABA9C4','#CFCDDE')#azul
+ 
+ 
+ 
+ paleta12<-c('#4D5FA5','#08754F','#34984F','#3EB45D','#96AB22','#E3D400','#98BF92','#CFDFC9')
+ 
+ 
+ 
+ paleta13<-c('#FDC730', '#FF9900', '#C64F34')#amarillo hacia marrón
+ 
+ 
+ 
+ paleta14<-c('#F39425','#EFB100','#E6B43D','#F5D133')#naranja, amarillo y gris
+ 
+ 
+ 
+ paleta15<-c("#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51") #burbujas
+ 
+ 
+ 
+ paletatot<-c('#8988AC','#ABA9C4','#CFCDDE','#59398A','#9781B7','#CABFDD','#4F60A6','#969ACB','#CBCCE7',
+              '#875597','#B397C2','#D8CBE2','#A183A3','#C6B3C7','#E2D8E4',
+              '#34984F','#98BF92','#CFDFC9','#96AB22','#C3CA7F','#E1E4C1',
+              '#8DA189','#BDC5B7','#DEE2DA',
+              '#464B6C','#4D5FA5','#88579A'
+ )
+ 
+ 

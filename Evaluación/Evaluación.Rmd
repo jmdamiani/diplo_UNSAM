@@ -19,11 +19,13 @@ library(openxlsx)
 library(hms)
 library(eph)
 
-salario_promedio <- read.csv("w_mean_depto_total_clae2.csv", header = TRUE, sep = ",", dec = ".") 
+salario_promedio <- read.csv("data/w_mean_depto_total_clae2.csv", header = TRUE, sep = ",", dec = ".") 
 
-depto <- read.csv("diccionario_cod_depto.csv", header = TRUE, sep = ",", dec = ".")
+depto <- read.csv("data/diccionario_cod_depto.csv", header = TRUE, sep = ",", dec = ".")
 
-claes <- read.csv("diccionario_clae2.csv", header = TRUE, sep = ",", dec = ".")
+claes <- read.csv("data/w_mean_depto_total_clae2.csv", header = TRUE, sep = ",", dec = ".")
+
+
 
 ?organize_caes
 

@@ -18,16 +18,63 @@ library(readxl)
 library(openxlsx)
 library(hms)
 library(eph)
+library(lubridate)
+library(sf)
 
-salario_promedio <- read.csv("data/w_mean_depto_total_clae2.csv", header = TRUE, sep = ",", dec = ".") 
+#Carga de bases
 
-depto <- read.csv("data/diccionario_cod_depto.csv", header = TRUE, sep = ",", dec = ".")
-
-claes <- read.csv("data/w_mean_depto_total_clae2.csv", header = TRUE, sep = ",", dec = ".")
+salario_promedio <- read.csv("data/w_mean_depto_total_clae2.csv", header = TRUE, sep = ";", dec = ".", stringsAsFactors=FALSE) 
 
 
+salario_promedio <- salario_promedio %>% 
+  mutate(linkPROV=case_when(id_provincia_indec<10~paste0("0",id_provincia_indec),
+                            id_provincia_indec>=10~as.character(id_provincia_indec)),
+         linkDPTOF=case_when(codigo_departamento_indec<=6999~paste0("0",codigo_departamento_indec),
+                             # codigo_departamento_indec>=10 & codigo_departamento_indec<100~paste0("0",codigo_departamento_indec),
+                             codigo_departamento_indec>=7000~as.character(codigo_departamento_indec)),
+         link.x=paste0(linkPROV,linkDPTOF))
 
-?organize_caes
+depto <- read.csv("data/diccionario_cod_depto.csv", header = TRUE, sep = ";", dec = ".", stringsAsFactors=FALSE)
+
+depto <- depto %>% 
+  mutate(linkPROV=case_when(id_provincia_indec<10~paste0("0",id_provincia_indec),
+                            id_provincia_indec>=10~as.character(id_provincia_indec)),
+         linkDPTOF=case_when(codigo_departamento_indec<=6999~paste0("0",codigo_departamento_indec),
+                             # codigo_departamento_indec>=10 & codigo_departamento_indec<100~paste0("0",codigo_departamento_indec),
+                             codigo_departamento_indec>=7000~as.character(codigo_departamento_indec)),
+         link.x=paste0(linkPROV,linkDPTOF))
+
+claes <- read.csv("data/diccionario_clae2.csv", header = TRUE, sep = ",", dec = ".")
+
+
+
+#Limpieza y armado de base final
+
+salario <- left_join(salario_promedio, depto, by = c('linkDPTOF', 'linkPROV'))
+
+salarioF <- left_join(salario, claes, by = 'clae2') %>% 
+  select('fecha','linkPROV','linkDPTOF','clae2_desc','letra_desc','w_mean')
+
+salarioF <- salarioF %>% 
+  rename(Fecha = fecha,
+         codpcia                   = linkPROV,
+         codigo_departamento_indec = linkDPTOF,
+         Actividad_económica  = clae2_desc,
+         Sector_de_actividad  = letra_desc,
+         Media_salarial       = w_mean)
+
+#Base georeferenciada
+
+depts_gjson <- read_sf("data/departamentos_arg.geojson")
+  
+deptos_georef <- left_join(salarioF, depts_gjson, by = 'codigo_departamento_indec')
+
+depto$codigo_departamento_indec <- as.character(depto$codigo_departamento_indec)
+
+#para resolver caba, filter provincia 02 y summarise (promediar todo a 2000)
+```
+
+```{r}
 
 ```
 
